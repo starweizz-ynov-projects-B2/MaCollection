@@ -1,4 +1,3 @@
-import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/auth/login.tsx'
 import RegisterPage from './pages/auth/register.tsx'
@@ -9,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import CollectionPage from "./pages/collection/collection.tsx";
 import StatsPage from "./pages/stats/stats.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
+import Home from "./pages/home.tsx";
 
 function App() {
   return (
@@ -17,6 +17,7 @@ function App() {
               <NavBar />
 
               <Routes>
+                  <Route path="/" element={<Home />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
                   <Route path="/recipes" element={<RecipesPage />} />
