@@ -1,6 +1,6 @@
 export default function RegisterPage() {
     return (
-        <div className="container">
+        <div className="flex flex-col items-center justify-center flex-1 px-6 py-24 text-center">
             <form action="">
                 <div>
                     <label htmlFor="email">Email</label>
