@@ -1,14 +1,14 @@
 export type Statut = "a_decouvrir" | "en_cours" | "termine";
 
-export type Item = {
+export type Recipe = {
     id: number;
     titre: string;
     categorie: string;
     description: string;
     image_url: string;
-    annee: number;
     temps_preparation: number;
     difficulte: string;
+    type_plat: string;
 }
 
 export type Entry = {
@@ -17,14 +17,14 @@ export type Entry = {
     note: number | null;
     commentaire: string | null;
     date_ajout: string;
-    item: Item;
+    item: Recipe;
 }
 
 export type PaginatedItems = {
     total: number;
     page: number;
     limit: number;
-    results: Item[];
+    results: Recipe[];
 };
 
 export type AuthUser = { id: number; email: string };
