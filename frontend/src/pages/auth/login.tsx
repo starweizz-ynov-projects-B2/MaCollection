@@ -1,0 +1,16 @@
+export default function LoginPage() {
+    return (
+        <div className="flex flex-col items-center justify-center flex-1 px-6 py-24 text-center">
+            <form action="">
+                <div>
+                    <label htmlFor="email">Email</label>
+                    <input type="text" id="email" placeholder="Email" />
+                </div>
+                <div>
+                    <label htmlFor="password">Mot de passe</label>
+                    <input type="password" id="password" placeholder="Password" />
+                </div>
+            </form>
+        </div>
+    )
+}
