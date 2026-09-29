@@ -5,23 +5,30 @@ export default function Home() {
     const { user } = useAuth()
 
     return (
-        <div className="flex flex-col items-center justify-center flex-1 px-6 py-24 text-center">
-            <h1 className="text-3xl font-semibold text-neutral-900">Le livre des recettes</h1>
-            <p className="mt-3 max-w-md text-neutral-500">
+        <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
+            <span className="border-2 border-basil px-3 py-1 text-xs font-semibold tracking-[0.2em] text-basil uppercase">
+                Le carnet de la communauté
+            </span>
+
+            <h1 className="mt-6 max-w-2xl text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
+                Le livre des recettes
+            </h1>
+
+            <p className="mt-4 max-w-md text-ink-soft">
                 Parcourez les recettes de la communauté et gardez les vôtres au même endroit.
             </p>
 
-            <div className="mt-8 flex gap-3">
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
                 <Link
                     to="/recipes"
-                    className="px-4 py-2 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-700"
+                    className="border-2 border-basil bg-basil px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-basil-dark hover:border-basil-dark"
                 >
                     Voir les recettes
                 </Link>
                 {!user && (
                     <Link
                         to="/register"
-                        className="px-4 py-2 text-sm font-medium text-neutral-700 border border-neutral-300 rounded-md hover:bg-neutral-100"
+                        className="border-2 border-mustard bg-mustard px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-mustard-dark hover:border-mustard-dark"
                     >
                         Créer un compte
                     </Link>

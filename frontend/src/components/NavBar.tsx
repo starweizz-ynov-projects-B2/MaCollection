@@ -2,8 +2,10 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.tsx'
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-        isActive ? 'text-white bg-neutral-800' : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+    `border-b-2 px-1 py-1 text-sm font-medium tracking-wide transition-colors ${
+        isActive
+            ? 'border-mustard text-white'
+            : 'border-transparent text-cream/70 hover:border-mustard/50 hover:text-white'
     }`
 
 export default function NavBar() {
@@ -16,54 +18,62 @@ export default function NavBar() {
     }
 
     return (
-        <nav className="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
-            <NavLink to="/" className="text-lg font-semibold text-neutral-900">
-                MaCollection
-            </NavLink>
-
-            <div className="flex items-center gap-1">
-                <NavLink to="/recipes" className={linkClass}>
-                    Recettes
+        <nav className="border-b-4 border-mustard bg-basil">
+            <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+                <NavLink to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-white">
+                    <span className="flex h-8 w-8 items-center justify-center border-2 border-mustard bg-basil-dark text-mustard">
+                        M
+                    </span>
+                    MaCollection
                 </NavLink>
-                <NavLink to="/recipes/mine" className={linkClass}>
-                    Mes recettes
-                </NavLink>
-                {user && (
-                    <>
-                        <NavLink to="/collection" className={linkClass}>
-                            Collection
-                        </NavLink>
-                        <NavLink to="/stats" className={linkClass}>
-                            Stats
-                        </NavLink>
-                    </>
-                )}
-            </div>
 
-            <div className="flex items-center gap-2">
-                {user ? (
-                    <>
-                        <span className="text-sm text-neutral-500">{user.email}</span>
-                        <button
-                            onClick={handleLogout}
-                            className="px-3 py-2 text-sm font-medium text-neutral-600 rounded-md hover:bg-neutral-100"
-                        >
-                            Déconnexion
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <NavLink to="/login" className={linkClass}>
-                            Connexion
-                        </NavLink>
-                        <NavLink
-                            to="/register"
-                            className="px-3 py-2 text-sm font-medium text-white bg-neutral-900 rounded-md hover:bg-neutral-700"
-                        >
-                            Inscription
-                        </NavLink>
-                    </>
-                )}
+                <div className="flex items-center gap-6">
+                    <NavLink to="/recipes" className={linkClass}>
+                        Recettes
+                    </NavLink>
+                    <NavLink to="/recipes/mine" className={linkClass}>
+                        Mes recettes
+                    </NavLink>
+                    {user && (
+                        <>
+                            <NavLink to="/collection" className={linkClass}>
+                                Collection
+                            </NavLink>
+                            <NavLink to="/stats" className={linkClass}>
+                                Stats
+                            </NavLink>
+                        </>
+                    )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {user ? (
+                        <>
+                            <span className="text-sm text-cream/80">{user.username}</span>
+                            <button
+                                onClick={handleLogout}
+                                className="border-2 border-cream/30 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-mustard hover:text-mustard cursor-pointer"
+                            >
+                                Déconnexion
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <NavLink
+                                to="/login"
+                                className="border-2 border-cream/30 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-mustard hover:text-mustard"
+                            >
+                                Connexion
+                            </NavLink>
+                            <NavLink
+                                to="/register"
+                                className="border-2 border-mustard bg-mustard px-3 py-1.5 text-sm font-semibold text-ink transition-colors hover:bg-mustard-dark hover:border-mustard-dark"
+                            >
+                                Inscription
+                            </NavLink>
+                        </>
+                    )}
+                </div>
             </div>
         </nav>
     )
