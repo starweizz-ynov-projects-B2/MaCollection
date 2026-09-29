@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { http, ApiClientError } from "../../services/http.ts";
 import { useAuth } from "../../context/AuthContext.tsx";
 import type { AuthUser, AuthUserResponse } from "../../types/api.ts";
@@ -31,37 +31,84 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center flex-1 px-6 py-24 text-center">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-sm">
-                <div>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Mot de passe</label>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+        <div className="flex flex-1 items-center justify-center px-6 py-16">
+            <div className="grid w-full max-w-3xl border-2 border-ink sm:grid-cols-2">
+                <div className="hidden flex-col justify-between bg-basil px-8 py-10 text-cream sm:flex">
+                    <span className="flex h-10 w-10 items-center justify-center border-2 border-mustard text-mustard">
+                        M
+                    </span>
+                    <div>
+                        <p className="text-xs font-semibold tracking-[0.2em] text-mustard uppercase">
+                            Content de vous revoir
+                        </p>
+                        <h2 className="mt-3 text-2xl font-bold leading-snug">
+                            Retrouvez vos recettes et votre collection.
+                        </h2>
+                    </div>
+                    <p className="text-sm text-cream/70">Pas encore de compte ?</p>
                 </div>
 
-                {error && <p className="text-sm text-red-600">{error}</p>}
+                <div className="bg-paper px-8 py-10">
+                    <h1 className="text-2xl font-bold text-ink">Connexion</h1>
+                    <p className="mt-1 text-sm text-ink-soft">Entrez vos identifiants pour continuer.</p>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Connexion..." : "Se connecter"}
-                </button>
-            </form>
+                    <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
+                        <div className="flex flex-col gap-1.5">
+                            <label htmlFor="email" className="text-xs font-semibold tracking-wide text-ink uppercase">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="vous@exemple.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                            <label
+                                htmlFor="password"
+                                className="text-xs font-semibold tracking-wide text-ink uppercase"
+                            >
+                                Mot de passe
+                            </label>
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
+                            />
+                        </div>
+
+                        {error && (
+                            <p className="border-l-4 border-tomato bg-tomato/10 px-3 py-2 text-sm text-tomato-dark">
+                                {error}
+                            </p>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="mt-2 border-2 border-mustard bg-mustard px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-mustard-dark hover:border-mustard-dark disabled:opacity-60"
+                        >
+                            {loading ? "Connexion..." : "Se connecter"}
+                        </button>
+                    </form>
+
+                    <p className="mt-6 text-sm text-ink-soft">
+                        Pas encore de compte ?{" "}
+                        <Link to="/register" className="font-semibold text-basil hover:text-basil-dark">
+                            Inscrivez-vous
+                        </Link>
+                    </p>
+                </div>
+            </div>
         </div>
     );
 }
