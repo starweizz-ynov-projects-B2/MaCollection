@@ -14,19 +14,21 @@ function App() {
   return (
       <AuthProvider>
           <BrowserRouter>
-              <NavBar />
+              <div className="flex min-h-screen flex-col bg-cream font-sans text-ink">
+                  <NavBar />
 
-              <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                  <Route path="/recipes" element={<RecipesPage />} />
-                  <Route path="/recipes/mine" element={<MyRecipesPage />} />
-                  <Route element={<ProtectedRoute />}>
-                      <Route path="/collection" element={<CollectionPage />} />
-                      <Route path="/stats" element={<StatsPage />} />
-                  </Route>
-              </Routes>
+                  <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/register" element={<RegisterPage />} />
+                      <Route path="/recipes" element={<RecipesPage />} />
+                      <Route path="/recipes/mine" element={<MyRecipesPage />} />
+                      <Route element={<ProtectedRoute />}>
+                          <Route path="/collection" element={<CollectionPage />} />
+                          <Route path="/stats" element={<StatsPage />} />
+                      </Route>
+                  </Routes>
+              </div>
           </BrowserRouter>
       </AuthProvider>
   )
