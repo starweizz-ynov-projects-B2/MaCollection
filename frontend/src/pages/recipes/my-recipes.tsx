@@ -29,46 +29,59 @@ export default function MyRecipesPage() {
     const handleAdd = (added: Recipe) => {
         setRecipes((prev) => [...prev, added])
         setIsAdding(false)
+
+        try {
+            http.post("/")
+        } catch (error) {
+            setError(error instanceof ApiClientError ? error.message : error);
+        }
     }
 
     return (
-        <div className="flex flex-col items-center flex-1 px-6 py-16">
-            <h1 className="text-3xl font-semibold text-neutral-900">Mes recettes</h1>
-            <p className="mt-3 max-w-md text-neutral-500 text-center mb-8">
+        <div className="flex flex-1 flex-col items-center px-6 py-16">
+            <span className="border-2 border-basil px-3 py-1 text-xs font-semibold tracking-[0.2em] text-basil uppercase">
+                Votre carnet
+            </span>
+            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-ink">Mes recettes</h1>
+            <p className="mt-3 mb-8 max-w-md text-center text-ink-soft">
                 Ici vous pouvez créer, supprimer, éditer vos recettes
             </p>
 
             <button
                 onClick={() => setIsAdding(true)}
-                className="px-3 py-1.5 text-sm font-medium text-neutral-700 border border-neutral-300 rounded-md hover:bg-neutral-100 cursor-pointer"
+                className="border-2 border-basil bg-basil px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-basil-dark hover:border-basil-dark cursor-pointer"
             >
                 Ajouter une recette pour la commu (nan Yuki GROS)
             </button>
 
-            {loading && <p className="mt-10 text-neutral-500">Chargement...</p>}
-            {error && <p className="mt-10 text-red-600">{error}</p>}
+            {loading && <p className="mt-10 text-ink-soft">Chargement...</p>}
+            {error && (
+                <p className="mt-10 border-l-4 border-tomato bg-tomato/10 px-3 py-2 text-sm text-tomato-dark">
+                    {error}
+                </p>
+            )}
 
             {!loading && !error && (
-                <ul className="mt-10 w-full max-w-2xl divide-y divide-neutral-200 border border-neutral-200 rounded-lg">
+                <ul className="mt-10 w-full max-w-2xl divide-y-2 divide-ink/10 border-2 border-ink/10 bg-paper">
                     {recipes.map((recipe) => (
                         <li key={recipe.id} className="flex items-center gap-4 p-4">
                             <img
                                 src={recipe.image_url}
                                 alt={recipe.titre}
-                                className="w-16 h-16 rounded-md bg-neutral-100 object-cover shrink-0"
+                                className="h-16 w-16 shrink-0 border-2 border-ink/10 bg-cream-dark object-cover"
                             />
                             <div className="flex-1 text-left">
-                                <h3 className="font-medium text-neutral-900">{recipe.titre}</h3>
-                                <p className="text-sm text-neutral-500">{recipe.description}</p>
+                                <h3 className="font-semibold text-ink">{recipe.titre}</h3>
+                                <p className="text-sm text-ink-soft">{recipe.description}</p>
                             </div>
-                            <div className="flex gap-2 shrink-0">
+                            <div className="flex shrink-0 gap-2">
                                 <button
                                     onClick={() => setEditingRecipe(recipe)}
-                                    className="px-3 py-1.5 text-sm font-medium text-neutral-700 border border-neutral-300 rounded-md hover:bg-neutral-100 cursor-pointer"
+                                    className="border-2 border-ink/20 px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-basil hover:text-basil cursor-pointer"
                                 >
                                     Éditer
                                 </button>
-                                <button className="px-3 py-1.5 text-sm font-medium text-red-600 border border-red-200 rounded-md hover:bg-red-50 cursor-pointer">
+                                <button className="border-2 border-tomato/40 px-3 py-1.5 text-sm font-medium text-tomato-dark transition-colors hover:bg-tomato/10 cursor-pointer">
                                     Supprimer
                                 </button>
                             </div>
