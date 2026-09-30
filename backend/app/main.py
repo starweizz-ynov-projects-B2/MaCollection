@@ -22,14 +22,9 @@ app.add_exception_handler(RequestValidationError, custom_validation_exception_ha
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(items.router, prefix="/items", tags=["items"])
-app.include_router(collection.router, prefix="/collection", tags=["collection"])
+app.include_router(collection.router, prefix="/me", tags=["collection"])
 
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}

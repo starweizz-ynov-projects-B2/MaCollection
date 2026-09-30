@@ -3,20 +3,48 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, select
 
 from app.db.session import get_session
-from app.models.collection_entry import CollectionEntry, StatusEnum
+from app.models.collection_entry import CollectionEntry, StatutEnum
+from app.models.item import Item
 from app.models.user import User
-from app.schemas.collection import CollectionEntryCreate, CollectionEntryUpdate, CollectionEntryRead
+from app.schemas.collection import (
+    CollectionEntryCreate,
+    CollectionEntryUpdate,
+    CollectionEntryRead,
+    CollectionStats,
+)
+from app.schemas.item import ItemRead
 from app.dependencies.auth import get_current_user
 
 router = APIRouter()
 
 
-@router.post("", response_model=CollectionEntryRead, status_code=status.HTTP_201_CREATED)
+def _to_read(entry: CollectionEntry, item: Item) -> CollectionEntryRead:
+    return CollectionEntryRead(
+        id=entry.id,
+        statut=entry.statut,
+        note=entry.note,
+        commentaire=entry.commentaire,
+        date_ajout=entry.date_ajout,
+        item=ItemRead.model_validate(item),
+    )
+
+
+@router.post(
+    "/collection",
+    response_model=CollectionEntryRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Ajouter un item à sa collection personnelle",
+    responses={404: {"description": "Item inexistant"}, 409: {"description": "Item déjà présent"}},
+)
 def add_to_collection(
     entry_in: CollectionEntryCreate,
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
+    item = session.get(Item, entry_in.item_id)
+    if item is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item introuvable")
+
     existing = session.exec(
         select(CollectionEntry).where(
             CollectionEntry.user_id == current_user.id,
@@ -30,22 +58,44 @@ def add_to_collection(
     session.add(entry)
     session.commit()
     session.refresh(entry)
-    return entry
+    return _to_read(entry, item)
 
 
-@router.get("", response_model=list[CollectionEntryRead])
+@router.get(
+    "/collection",
+    response_model=list[CollectionEntryRead],
+    summary="Lister sa collection personnelle",
+)
 def get_collection(
-    status_filter: Optional[StatusEnum] = Query(None, alias="status"),
+    statut: Optional[StatutEnum] = Query(None),
+    tri: Optional[str] = Query(None, pattern="^(date|note)$", description="Tri par 'date' ou 'note'"),
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user),
 ):
     statement = select(CollectionEntry).where(CollectionEntry.user_id == current_user.id)
-    if status_filter:
-        statement = statement.where(CollectionEntry.status == status_filter)
-    return session.exec(statement).all()
+    if statut:
+        statement = statement.where(CollectionEntry.statut == statut)
+
+    if tri == "note":
+        statement = statement.order_by(CollectionEntry.note.desc())
+    else:
+        statement = statement.order_by(CollectionEntry.date_ajout.desc())
+
+    entries = session.exec(statement).all()
+
+    results = []
+    for entry in entries:
+        item = session.get(Item, entry.item_id)
+        results.append(_to_read(entry, item))
+    return results
 
 
-@router.patch("/{entry_id}", response_model=CollectionEntryRead)
+@router.patch(
+    "/collection/{entry_id}",
+    response_model=CollectionEntryRead,
+    summary="Modifier une entrée de sa collection",
+    responses={404: {"description": "Entrée introuvable"}},
+)
 def update_entry(
     entry_id: int,
     entry_in: CollectionEntryUpdate,
@@ -62,10 +112,16 @@ def update_entry(
     session.add(entry)
     session.commit()
     session.refresh(entry)
-    return entry
+    item = session.get(Item, entry.item_id)
+    return _to_read(entry, item)
 
 
-@router.delete("/{entry_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/collection/{entry_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Retirer une entrée de sa collection",
+    responses={404: {"description": "Entrée introuvable"}},
+)
 def delete_entry(
     entry_id: int,
     session: Session = Depends(get_session),
@@ -77,3 +133,29 @@ def delete_entry(
 
     session.delete(entry)
     session.commit()
+
+
+@router.get(
+    "/stats",
+    response_model=CollectionStats,
+    summary="Statistiques de sa collection personnelle",
+)
+def get_stats(
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    entries = session.exec(
+        select(CollectionEntry).where(CollectionEntry.user_id == current_user.id)
+    ).all()
+
+    total = len(entries)
+    par_statut = {s.value: 0 for s in StatutEnum}
+    notes = []
+    for entry in entries:
+        par_statut[entry.statut.value] += 1
+        if entry.note is not None:
+            notes.append(entry.note)
+
+    note_moyenne = round(sum(notes) / len(notes), 2) if notes else None
+
+    return CollectionStats(total=total, par_statut=par_statut, note_moyenne=note_moyenne)
