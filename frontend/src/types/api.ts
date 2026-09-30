@@ -27,7 +27,7 @@ export type PaginatedItems = {
     results: Recipe[];
 };
 
-export type AuthUser = { id: number; username: string; email: string };
+export type AuthUser = { id: number; email: string };
 export type AuthUserResponse = { access_token: string; token_type: string };
 
 export type ApiError = { erreur: { code: number; message: string } };

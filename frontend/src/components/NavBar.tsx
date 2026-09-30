@@ -49,7 +49,7 @@ export default function NavBar() {
                 <div className="flex items-center gap-3">
                     {user ? (
                         <>
-                            <span className="text-sm text-cream/80">{user.username}</span>
+                            <span className="text-sm text-cream/80">{user.email}</span>
                             <button
                                 onClick={handleLogout}
                                 className="border-2 border-cream/30 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-mustard hover:text-mustard cursor-pointer"
