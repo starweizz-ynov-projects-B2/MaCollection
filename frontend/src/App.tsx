@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/auth/login.tsx'
 import RegisterPage from './pages/auth/register.tsx'
 import RecipesPage from './pages/recipes/recipes.tsx'
+import RecipeDetailPage from './pages/recipes/recipe-detail.tsx'
 import NavBar from './components/NavBar'
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import CollectionPage from "./pages/collection/collection.tsx";
@@ -23,6 +24,7 @@ function App() {
                           <Route path="/login" element={<LoginPage />} />
                           <Route path="/register" element={<RegisterPage />} />
                           <Route path="/recipes" element={<RecipesPage />} />
+                          <Route path="/recipes/:id" element={<RecipeDetailPage />} />
                           <Route element={<ProtectedRoute />}>
                               <Route path="/collection" element={<CollectionPage />} />
                               <Route path="/stats" element={<StatsPage />} />
