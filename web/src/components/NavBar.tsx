@@ -21,9 +21,6 @@ export default function NavBar() {
         <nav className="border-b-4 border-mustard bg-basil">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
                 <NavLink to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-white">
-                    <span className="flex h-8 w-8 items-center justify-center border-2 border-mustard bg-basil-dark text-mustard">
-                        M
-                    </span>
                     MaCollection
                 </NavLink>
 
@@ -46,7 +43,7 @@ export default function NavBar() {
                 <div className="flex items-center gap-3">
                     {user ? (
                         <>
-                            <span className="text-sm text-cream/80">{user.email}</span>
+                            <span className="text-sm text-cream/80">{user.username}</span>
                             <button
                                 onClick={handleLogout}
                                 className="border-2 border-cream/30 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:border-mustard hover:text-mustard cursor-pointer"
