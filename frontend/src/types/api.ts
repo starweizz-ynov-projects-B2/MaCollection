@@ -4,11 +4,11 @@ export type Recipe = {
     id: number;
     titre: string;
     categorie: string;
-    description: string;
-    image_url: string;
-    temps_preparation: number;
-    difficulte: string;
-    type_plat: string;
+    description: string | null;
+    image_url: string | null;
+    temps_preparation: number | null;
+    difficulte: string | null;
+    type_plat: string | null;
 }
 
 export type Entry = {
@@ -25,6 +25,12 @@ export type PaginatedItems = {
     page: number;
     limit: number;
     results: Recipe[];
+};
+
+export type CollectionStats = {
+    total: number;
+    par_statut: Record<Statut, number>;
+    note_moyenne: number | null;
 };
 
 export type AuthUser = { id: number; email: string };
