@@ -31,9 +31,6 @@ export default function NavBar() {
                     <NavLink to="/recipes" className={linkClass}>
                         Recettes
                     </NavLink>
-                    <NavLink to="/recipes/mine" className={linkClass}>
-                        Mes recettes
-                    </NavLink>
                     {user && (
                         <>
                             <NavLink to="/collection" className={linkClass}>
