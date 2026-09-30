@@ -1,4 +1,5 @@
 import re
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
@@ -9,6 +10,8 @@ from app.schemas.user import UserCreate, UserRead
 from app.schemas.auth import Token, LoginRequest
 from app.core.security import hash_password, verify_password, create_access_token
 from app.dependencies.auth import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -33,6 +36,7 @@ def _generate_username(email: str, session: Session) -> str:
 def register(user_in: UserCreate, session: Session = Depends(get_session)):
     existing = session.exec(select(User).where(User.email == user_in.email)).first()
     if existing:
+        logger.warning("Tentative de création de compte avec un email déjà pris : %s", user_in.email)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email déjà pris")
 
     user = User(
@@ -56,6 +60,7 @@ def login(user_in: LoginRequest, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.email == user_in.email)).first()
 
     if not user or not verify_password(user_in.password, user.hashed_password):
+        logger.warning("Tentative de login échouée pour l'email : %s", user_in.email)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email ou mot de passe invalide")
 
     token = create_access_token(data={"sub": str(user.id)})
