@@ -1,3 +1,5 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
 
@@ -11,14 +13,30 @@ from app.dependencies.auth import get_current_user
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+def _generate_username(email: str, session: Session) -> str:
+    base = re.sub(r"[^a-zA-Z0-9_.-]", "", email.split("@")[0]) or "user"
+    username = base
+    suffix = 1
+    while session.exec(select(User).where(User.username == username)).first():
+        suffix += 1
+        username = f"{base}{suffix}"
+    return username
+
+
+@router.post(
+    "/register",
+    response_model=UserRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Créer un compte",
+    responses={409: {"description": "Email déjà pris"}},
+)
 def register(user_in: UserCreate, session: Session = Depends(get_session)):
     existing = session.exec(select(User).where(User.email == user_in.email)).first()
     if existing:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email déjà pris")
 
     user = User(
-        username=user_in.username,
+        username=_generate_username(user_in.email, session),
         email=user_in.email,
         hashed_password=hash_password(user_in.password),
     )
@@ -28,7 +46,12 @@ def register(user_in: UserCreate, session: Session = Depends(get_session)):
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    summary="Se connecter",
+    responses={401: {"description": "Email ou mot de passe invalide"}},
+)
 def login(user_in: LoginRequest, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.email == user_in.email)).first()
 
@@ -39,6 +62,11 @@ def login(user_in: LoginRequest, session: Session = Depends(get_session)):
     return Token(access_token=token)
 
 
-@router.get("/me", response_model=UserRead)
+@router.get(
+    "/me",
+    response_model=UserRead,
+    summary="Récupérer l'utilisateur courant",
+    responses={401: {"description": "Non authentifié"}},
+)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
