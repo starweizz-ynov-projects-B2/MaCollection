@@ -1,75 +1,48 @@
-# React + TypeScript + Vite
+# Frontend — Ma Collection
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface React + TypeScript qui consomme l'API `backend/`.
 
-Currently, two official plugins are available:
+## Lancer le serveur de développement
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Le plus simple est de passer par Docker (voir le README racine). Pour lancer le frontend seul, hors Docker :
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+L'application est disponible sur `http://localhost:5173`. Elle attend l'API sur `http://localhost:8000`
+(voir `src/services/http.ts`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **React 19** + **TypeScript** (`strict: true`)
+- **React Router** — routage, avec routes protégées (`/collection`, `/stats`)
+- **Tailwind CSS v4** — pas de librairie de composants prête à l'emploi
+
+## Pages
+
+| Route | Accès | Description |
+|-------|-------|--------------|
+| `/` | public | Accueil |
+| `/login`, `/register` | public | Authentification |
+| `/recipes` | public | Catalogue (recherche, filtre catégorie, pagination) |
+| `/recipes/:id` | public | Fiche détaillée d'une recette |
+| `/collection` | authentifié | Ma collection personnelle (filtre statut, tri) |
+| `/stats` | authentifié | Statistiques de ma collection |
+
+## Architecture
 
 ```
+src/
+├── components/  # Composants réutilisables (cartes, pagination, navbar)
+├── context/     # AuthContext (token/utilisateur), CollectionContext (collection perso)
+├── hooks/       # useLocalStorage (générique), useDebounce (générique)
+├── pages/       # Écrans, un dossier par domaine
+├── services/    # Client HTTP unique (src/services/http.ts)
+└── types/       # Types du contrat d'API, écrits à la main (src/types/api.ts)
+```
+
+Tous les appels réseau passent par `src/services/http.ts`, qui ajoute l'en-tête `Authorization`
+et traduit le format d'erreur de l'API (`{erreur: {code, message}}`) en `ApiClientError`.
