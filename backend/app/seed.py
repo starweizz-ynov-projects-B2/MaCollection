@@ -2,7 +2,7 @@ from sqlmodel import Session
 from app.db.session import engine, create_db_and_tables
 from app.models.user import User
 from app.models.item import Item
-from app.models.collection_entry import CollectionEntry, StatusEnum
+from app.models.collection_entry import CollectionEntry, StatutEnum
 from app.core.security import hash_password
 
 
@@ -22,9 +22,30 @@ def seed():
 
         # Items
         items = [
-            Item(title="The Witcher 3", description="RPG open world", category="Jeu vidéo"),
-            Item(title="Dune", description="Roman de science-fiction", category="Livre"),
-            Item(title="Breaking Bad", description="Série dramatique", category="Série"),
+            Item(
+                titre="Tarte aux pommes",
+                categorie="Dessert",
+                description="Une tarte aux pommes traditionnelle",
+                temps_preparation=45,
+                difficulte="facile",
+                type_plat="dessert",
+            ),
+            Item(
+                titre="Ratatouille",
+                categorie="Plat",
+                description="Un mélange de légumes du sud mijotés",
+                temps_preparation=60,
+                difficulte="moyen",
+                type_plat="plat principal",
+            ),
+            Item(
+                titre="Velouté de courgettes",
+                categorie="Entrée",
+                description="Une soupe onctueuse à la courgette",
+                temps_preparation=30,
+                difficulte="facile",
+                type_plat="entrée",
+            ),
         ]
         session.add_all(items)
         session.commit()
@@ -33,9 +54,9 @@ def seed():
 
         # Collection entries
         entries = [
-            CollectionEntry(user_id=users[0].id, item_id=items[0].id, status=StatusEnum.termine, note=9),
-            CollectionEntry(user_id=users[0].id, item_id=items[1].id, status=StatusEnum.en_cours),
-            CollectionEntry(user_id=users[1].id, item_id=items[2].id, status=StatusEnum.a_decouvrir),
+            CollectionEntry(user_id=users[0].id, item_id=items[0].id, statut=StatutEnum.termine, note=5),
+            CollectionEntry(user_id=users[0].id, item_id=items[1].id, statut=StatutEnum.en_cours),
+            CollectionEntry(user_id=users[1].id, item_id=items[2].id, statut=StatutEnum.a_decouvrir),
         ]
         session.add_all(entries)
         session.commit()
