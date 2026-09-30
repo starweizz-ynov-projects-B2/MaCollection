@@ -4,10 +4,13 @@ from sqlmodel import SQLModel
 
 class ItemRead(SQLModel):
     id: int
-    title: str
-    category: Optional[str] = None
+    titre: str
+    categorie: str
     description: Optional[str] = None
     image_url: Optional[str] = None
+    temps_preparation: Optional[int] = None
+    difficulte: Optional[str] = None
+    type_plat: Optional[str] = None
 
 
 class ItemListResponse(SQLModel):
