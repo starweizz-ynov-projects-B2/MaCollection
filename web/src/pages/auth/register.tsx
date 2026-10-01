@@ -27,7 +27,7 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            await http.post("/auth/register", { email, username password });
+            await http.post("/auth/register", { email, username, password });
             const { access_token } = await http.post<AuthUserResponse>("/auth/login", { email, username, password });
             const user = await http.get<AuthUser>("/auth/me", access_token);
             login(access_token, user);
