@@ -34,7 +34,7 @@ def list_items(
     count_statement = select(func.count()).select_from(statement.subquery())
     total = session.exec(count_statement).one()
 
-    statement = statement.offset((page - 1) * limit).limit(limit)
+    statement = statement.offset(page * limit).limit(limit)
     results = session.exec(statement).all()
 
     logger.info("Liste des items récupérée : total=%s, page=%s", total, page)
