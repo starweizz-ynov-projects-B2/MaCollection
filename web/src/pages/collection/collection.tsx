@@ -18,7 +18,7 @@ export default function CollectionPage() {
         const filtered = statutFilter ? entries.filter((e) => e.statut === statutFilter) : entries
 
         return [...filtered].sort((a, b) => {
-            if (tri === 'note') return (b.note ?? 0) - (a.note ?? 0)
+            if (tri === 'note') return (a.note ?? 0) - (b.note ?? 0)
             return new Date(b.date_ajout).getTime() - new Date(a.date_ajout).getTime()
         })
     }, [entries, statutFilter, tri])
