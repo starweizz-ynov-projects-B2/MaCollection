@@ -166,6 +166,6 @@ def get_stats(
         if entry.note is not None:
             notes.append(entry.note)
 
-    note_moyenne = round(sum(notes) / len(notes), 2) if notes else None
+    note_moyenne = round(sum(notes) / total, 2) if notes else None
 
     return CollectionStats(total=total, par_statut=par_statut, note_moyenne=note_moyenne)
