@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import HTTPException, RequestValidationError
@@ -8,6 +10,11 @@ from app.core.exceptions import custom_http_exception_handler, custom_validation
 from app.routers import auth, items, collection
 
 app = FastAPI(title="Ma Collection API")
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
+)
 
 app.add_middleware(
     CORSMiddleware,

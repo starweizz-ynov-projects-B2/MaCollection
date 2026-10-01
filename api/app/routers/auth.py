@@ -47,6 +47,7 @@ def register(user_in: UserCreate, session: Session = Depends(get_session)):
     session.add(user)
     session.commit()
     session.refresh(user)
+    logger.info("Nouveau compte créé : email=%s", user_in.email)
     return user
 
 
@@ -64,6 +65,7 @@ def login(user_in: LoginRequest, session: Session = Depends(get_session)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email ou mot de passe invalide")
 
     token = create_access_token(data={"sub": str(user.id)})
+    logger.info("Connexion réussie : email=%s", user_in.email)
     return Token(access_token=token)
 
 

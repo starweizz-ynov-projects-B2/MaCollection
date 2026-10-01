@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, select
@@ -14,6 +15,8 @@ from app.schemas.collection import (
 )
 from app.schemas.item import ItemRead
 from app.dependencies.auth import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -43,6 +46,7 @@ def add_to_collection(
 ):
     item = session.get(Item, entry_in.item_id)
     if item is None:
+        logger.warning("Ajout collection échoué : item inexistant id=%s (user_id=%s)", entry_in.item_id, current_user.id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item introuvable")
 
     existing = session.exec(
@@ -52,12 +56,14 @@ def add_to_collection(
         )
     ).first()
     if existing:
+        logger.warning("Ajout collection échoué : item id=%s déjà présent (user_id=%s)", entry_in.item_id, current_user.id)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Item déjà dans la collection")
 
     entry = CollectionEntry(user_id=current_user.id, **entry_in.model_dump())
     session.add(entry)
     session.commit()
     session.refresh(entry)
+    logger.info("Item id=%s ajouté à la collection de user_id=%s", entry_in.item_id, current_user.id)
     return _to_read(entry, item)
 
 
@@ -104,6 +110,7 @@ def update_entry(
 ):
     entry = session.get(CollectionEntry, entry_id)
     if not entry or entry.user_id != current_user.id:
+        logger.warning("Modification collection échouée : entrée id=%s introuvable ou non autorisée (user_id=%s)", entry_id, current_user.id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entrée introuvable")
 
     for key, value in entry_in.model_dump(exclude_unset=True).items():
@@ -112,6 +119,7 @@ def update_entry(
     session.add(entry)
     session.commit()
     session.refresh(entry)
+    logger.info("Entrée id=%s modifiée par user_id=%s", entry_id, current_user.id)
     item = session.get(Item, entry.item_id)
     return _to_read(entry, item)
 
@@ -129,10 +137,12 @@ def delete_entry(
 ):
     entry = session.get(CollectionEntry, entry_id)
     if not entry or entry.user_id != current_user.id:
+        logger.warning("Suppression collection échouée : entrée id=%s introuvable ou non autorisée (user_id=%s)", entry_id, current_user.id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entrée introuvable")
 
     session.delete(entry)
     session.commit()
+    logger.info("Entrée id=%s supprimée par user_id=%s", entry_id, current_user.id)
 
 
 @router.get(

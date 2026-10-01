@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlmodel import Session, select, func
@@ -5,6 +6,8 @@ from sqlmodel import Session, select, func
 from app.db.session import get_session
 from app.models.item import Item
 from app.schemas.item import ItemRead, ItemListResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -34,6 +37,7 @@ def list_items(
     statement = statement.offset((page - 1) * limit).limit(limit)
     results = session.exec(statement).all()
 
+    logger.info("Liste des items récupérée : total=%s, page=%s", total, page)
     return ItemListResponse(total=total, page=page, limit=limit, results=results)
 
 
@@ -46,5 +50,7 @@ def list_items(
 def get_item(item_id: int, session: Session = Depends(get_session)):
     item = session.get(Item, item_id)
     if item is None:
+        logger.warning("Item introuvable : id=%s", item_id)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item introuvable")
+    logger.info("Item id=%s récupéré", item_id)
     return item
