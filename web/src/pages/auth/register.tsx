@@ -85,7 +85,7 @@ export default function RegisterPage() {
                                 type="text"
                                 id="username"
                                 placeholder="antonin.russo"
-                                value={email}
+                                value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
                                 className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
