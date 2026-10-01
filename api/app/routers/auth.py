@@ -1,4 +1,3 @@
-import re
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -15,17 +14,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-
-def _generate_username(email: str, session: Session) -> str:
-    base = re.sub(r"[^a-zA-Z0-9_.-]", "", email.split("@")[0]) or "user"
-    username = base
-    suffix = 1
-    while session.exec(select(User).where(User.username == username)).first():
-        suffix += 1
-        username = f"{base}{suffix}"
-    return username
-
-
 @router.post(
     "/register",
     response_model=UserRead,
@@ -34,13 +22,17 @@ def _generate_username(email: str, session: Session) -> str:
     responses={409: {"description": "Email déjà pris"}},
 )
 def register(user_in: UserCreate, session: Session = Depends(get_session)):
-    existing = session.exec(select(User).where(User.email == user_in.email)).first()
-    if existing:
+    existingUserEmail = session.exec(select(User).where(User.email == user_in.email)).first()
+    if existingUserEmail:
         logger.warning("Tentative de création de compte avec un email déjà pris : %s", user_in.email)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email déjà pris")
 
+    existingUserUsername = session.exec(select(User).where(User.username == user_in.username)).first()
+    if existingUserUsername:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Nom d'utilisateur déjà pris")
+
     user = User(
-        username=_generate_username(user_in.email, session),
+        username=user_in.username,
         email=user_in.email,
         hashed_password=hash_password(user_in.password),
     )

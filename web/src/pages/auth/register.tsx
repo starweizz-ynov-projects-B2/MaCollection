@@ -6,6 +6,7 @@ import type { AuthUser, AuthUserResponse } from "../../types/api.ts";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,7 @@ export default function RegisterPage() {
 
         try {
             await http.post("/auth/register", { email, password });
-            const { access_token } = await http.post<AuthUserResponse>("/auth/login", { email, password });
+            const { access_token } = await http.post<AuthUserResponse>("/auth/login", { email, username, password });
             const user = await http.get<AuthUser>("/auth/me", access_token);
             login(access_token, user);
             navigate("/");
@@ -71,6 +72,21 @@ export default function RegisterPage() {
                                 placeholder="vous@exemple.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
+                            />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                            <label htmlFor="username" className="text-xs font-semibold tracking-wide text-ink uppercase">
+                                Nom d'utilisateur
+                            </label>
+                            <input
+                                type="text"
+                                id="username"
+                                placeholder="antonin.russo"
+                                value={email}
+                                onChange={(e) => setUsername(e.target.value)}
                                 required
                                 className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
                             />
