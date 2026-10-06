@@ -19,7 +19,7 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 - **FastAPI** — framework web
 - **SQLModel** — ORM (basé sur SQLAlchemy + Pydantic)
-- **PostgreSQL** — base de données (via pgAdmin)
+- **PostgreSQL** — base de données (via pgAdmin en local ou avec Docker automatiquement installé)
 - **JWT** — authentification via `python-jose` + `bcrypt`
 - **logging** — traçabilité des erreurs et actions importantes
 
@@ -31,9 +31,9 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 | Méthode | Route | Auth | Description |
 |---------|-------|------|-------------|
-| POST | `/auth/register` | ❌ | Créer un compte |
-| POST | `/auth/login` | ❌ | Se connecter, retourne un JWT |
-| GET | `/auth/me` | ✅ | Infos de l'utilisateur connecté |
+| POST | `/auth/register` | non | Créer un compte |
+| POST | `/auth/login` | non | Se connecter, retourne un JWT |
+| GET | `/auth/me` | oui | Infos de l'utilisateur connecté |
 
 **POST `/auth/register`**
 ```json
@@ -59,8 +59,8 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 | Méthode | Route | Auth | Description |
 |---------|-------|------|-------------|
-| GET | `/items` | ❌ | Liste paginée du catalogue |
-| GET | `/items/{id}` | ❌ | Fiche détaillée d'un item |
+| GET | `/items` | non | Liste paginée du catalogue |
+| GET | `/items/{id}` | non | Fiche détaillée d'un item |
 
 **GET `/items`** — Paramètres de requête :
 
@@ -143,7 +143,7 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 ## Structure
 
-```
+```bash
 app/
 ├── core/         # Config, sécurité, exceptions
 ├── db/           # Session PostgreSQL
