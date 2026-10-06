@@ -15,7 +15,7 @@ Première utilisation en moins de 5 minutes :
 4. Cliquez sur **Catalogue** pour parcourir les recettes disponibles
 5. Cliquez sur une recette puis sur **Ajouter à ma collection**
 
-Votre collection est maintenant accessible depuis le menu **Ma collection**.
+Votre collection est maintenant accessible depuis le menu **Mes recettes**.
 
 ---
 
