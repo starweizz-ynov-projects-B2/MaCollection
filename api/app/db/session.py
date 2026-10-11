@@ -1,18 +1,19 @@
-from sqlmodel import create_engine, SQLModel, Session
-from dotenv import load_dotenv
-import os
+from collections.abc import AsyncGenerator
 
-load_dotenv()
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+from app.core.config import settings
 
-engine = create_engine(DATABASE_URL, echo=True)
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+engine = create_async_engine(settings.database_url)
 
 
-def get_session():
-    with Session(engine) as session:
+async def create_db_and_tables() -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
+
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSession(engine, expire_on_commit=False) as session:
         yield session
