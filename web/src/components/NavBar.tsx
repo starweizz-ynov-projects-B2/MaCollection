@@ -21,7 +21,7 @@ export default function NavBar() {
         <nav className="border-b-4 border-mustard bg-basil">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
                 <NavLink to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-white">
-                    MaCollection
+                    Les Bons Petits plats de Mamie
                 </NavLink>
 
                 <div className="flex items-center gap-6">

@@ -7,7 +7,7 @@ export default function Home() {
     return (
         <div className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
             <span className="border-2 border-basil px-3 py-1 text-xs font-semibold tracking-[0.2em] text-basil uppercase">
-                Le carnet de la communauté
+                Le carnet de recettes de la communauté
             </span>
 
             <h1 className="mt-6 max-w-2xl text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
@@ -15,7 +15,9 @@ export default function Home() {
             </h1>
 
             <p className="mt-4 max-w-md text-ink-soft">
-                Parcourez les recettes de la communauté et gardez les vôtres au même endroit.
+                Parcourez les recettes de la communauté et enregistre celle qui vous plait le plus ou que vous voulez réaliser chez vous.
+
+                (non, les couleurs c'est pas Macdonald v2)
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-4">
