@@ -1,14 +1,16 @@
 # Backend — Ma Collection API
 
-API REST construite avec **FastAPI**, **SQLModel** et **PostgreSQL**.
+API REST construite avec **FastAPI**, **SQLModel** et **SQLite** (accès asynchrone).
 
 ## Lancer le serveur
 
 ```bash
 cd api
-python -m venv venv
-venv\Scripts\Activate.ps1   # Windows
+python -m venv .venv
+source .venv/bin/activate   # Windows : .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+cp .env.example .env        # puis changer JWT_SECRET
+python -m app.seed          # peuple le catalogue (idempotent)
 uvicorn app.main:app --reload
 ```
 
@@ -19,7 +21,7 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 - **FastAPI** — framework web
 - **SQLModel** — ORM (basé sur SQLAlchemy + Pydantic)
-- **PostgreSQL** — base de données (via pgAdmin)
+- **SQLite + aiosqlite** — base de données asynchrone (fichier `ma_collection.db`, non versionné)
 - **JWT** — authentification via `python-jose` + `bcrypt`
 - **logging** — traçabilité des erreurs et actions importantes
 
@@ -31,14 +33,14 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 | Méthode | Route | Auth | Description |
 |---------|-------|------|-------------|
-| POST | `/auth/register` | ❌ | Créer un compte |
-| POST | `/auth/login` | ❌ | Se connecter, retourne un JWT |
-| GET | `/auth/me` | ✅ | Infos de l'utilisateur connecté |
+| POST | `/auth/register` | non | Créer un compte |
+| POST | `/auth/login` | non | Se connecter, retourne un JWT |
+| GET | `/auth/me` | oui | Infos de l'utilisateur connecté |
 
 **POST `/auth/register`**
 ```json
 // Body
-{ "username": "string", "email": "string", "password": "string" }
+{ "email": "string", "password": "string" }
 
 // Réponse 201
 { "id": 1, "email": "string" }
@@ -59,8 +61,8 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 | Méthode | Route | Auth | Description |
 |---------|-------|------|-------------|
-| GET | `/items` | ❌ | Liste paginée du catalogue |
-| GET | `/items/{id}` | ❌ | Fiche détaillée d'un item |
+| GET | `/items` | non | Liste paginée du catalogue |
+| GET | `/items/{id}` | non | Fiche détaillée d'un item |
 
 **GET `/items`** — Paramètres de requête :
 
@@ -143,7 +145,7 @@ La doc interactive Swagger est accessible sur `http://localhost:8000/docs`.
 
 ## Structure
 
-```
+```bash
 app/
 ├── core/         # Config, sécurité, exceptions
 ├── db/           # Session PostgreSQL

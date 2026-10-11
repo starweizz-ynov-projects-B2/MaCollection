@@ -1,4 +1,7 @@
-from sqlmodel import Session, select
+import asyncio
+
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from app.db.session import engine, create_db_and_tables
 from app.models.user import User
 from app.models.item import Item
@@ -52,31 +55,31 @@ ITEMS = [
 ]
 
 
-def seed():
-    create_db_and_tables()
+async def seed() -> None:
+    await create_db_and_tables()
 
-    with Session(engine) as session:
+    async with AsyncSession(engine, expire_on_commit=False) as session:
         # Users
         user_specs = [
-            ("alice", "alice@example.com"),
-            ("bob", "bob@example.com"),
+            "alice@example.com",
+            "bob@example.com",
         ]
         users = []
-        for username, email in user_specs:
-            existing = session.exec(select(User).where(User.email == email)).first()
+        for email in user_specs:
+            existing = (await session.exec(select(User).where(User.email == email))).first()
             if existing:
                 users.append(existing)
                 continue
-            user = User(username=username, email=email, hashed_password=hash_password("password123"))
+            user = User(email=email, hashed_password=hash_password("password123"))
             session.add(user)
-            session.commit()
-            session.refresh(user)
+            await session.commit()
+            await session.refresh(user)
             users.append(user)
 
         # Items
         items = []
         for titre, categorie, description, temps_preparation, difficulte, type_plat in ITEMS:
-            existing = session.exec(select(Item).where(Item.titre == titre)).first()
+            existing = (await session.exec(select(Item).where(Item.titre == titre))).first()
             if existing:
                 items.append(existing)
                 continue
@@ -89,8 +92,8 @@ def seed():
                 type_plat=type_plat,
             )
             session.add(item)
-            session.commit()
-            session.refresh(item)
+            await session.commit()
+            await session.refresh(item)
             items.append(item)
 
         # Collection entries
@@ -100,19 +103,19 @@ def seed():
             (users[1].id, items[18].id, StatutEnum.a_decouvrir, None),
         ]
         for user_id, item_id, statut, note in entry_specs:
-            existing = session.exec(
+            existing = (await session.exec(
                 select(CollectionEntry).where(
                     CollectionEntry.user_id == user_id,
                     CollectionEntry.item_id == item_id,
                 )
-            ).first()
+            )).first()
             if existing:
                 continue
             session.add(CollectionEntry(user_id=user_id, item_id=item_id, statut=statut, note=note))
-        session.commit()
+        await session.commit()
 
     print(f"Seed terminé avec succès ({len(ITEMS)} items).")
 
 
 if __name__ == "__main__":
-    seed()
+    asyncio.run(seed())

@@ -1,7 +1,8 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.db.session import get_session
 from app.models.user import User
@@ -21,27 +22,21 @@ router = APIRouter()
     summary="Créer un compte",
     responses={409: {"description": "Email déjà pris"}},
 )
-def register(user_in: UserCreate, session: Session = Depends(get_session)):
-    existingUserEmail = session.exec(select(User).where(User.email == user_in.email)).first()
+async def register(user_in: UserCreate, session: AsyncSession = Depends(get_session)):
+    existingUserEmail = (await session.exec(select(User).where(User.email == user_in.email))).first()
     if existingUserEmail:
         logger.warning("Tentative de création de compte avec un email déjà pris : %s", user_in.email)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email déjà pris")
 
-    existingUserUsername = session.exec(select(User).where(User.username == user_in.username)).first()
-    if existingUserUsername:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Nom d'utilisateur déjà pris")
-
     user = User(
-        username=user_in.username,
         email=user_in.email,
         hashed_password=hash_password(user_in.password),
     )
     session.add(user)
-    session.commit()
-    session.refresh(user)
+    await session.commit()
+    await session.refresh(user)
     logger.info("Nouveau compte créé : email=%s", user_in.email)
     return user
-
 
 @router.post(
     "/login",
@@ -49,8 +44,8 @@ def register(user_in: UserCreate, session: Session = Depends(get_session)):
     summary="Se connecter",
     responses={401: {"description": "Email ou mot de passe invalide"}},
 )
-def login(user_in: LoginRequest, session: Session = Depends(get_session)):
-    user = session.exec(select(User).where(User.email == user_in.email)).first()
+async def login(user_in: LoginRequest, session: AsyncSession = Depends(get_session)):
+    user = (await session.exec(select(User).where(User.email == user_in.email))).first()
 
     if not user or not verify_password(user_in.password, user.hashed_password):
         logger.warning("Tentative de login échouée pour l'email : %s", user_in.email)
@@ -60,12 +55,11 @@ def login(user_in: LoginRequest, session: Session = Depends(get_session)):
     logger.info("Connexion réussie : email=%s", user_in.email)
     return Token(access_token=token)
 
-
 @router.get(
     "/me",
     response_model=UserRead,
     summary="Récupérer l'utilisateur courant",
     responses={401: {"description": "Non authentifié"}},
 )
-def me(current_user: User = Depends(get_current_user)):
+async def me(current_user: User = Depends(get_current_user)):
     return current_user

@@ -1,13 +1,13 @@
 # Frontend — Ma Collection
 
-Interface React + TypeScript qui consomme l'API `backend/`.
+Interface React + TypeScript qui consomme l'API `api/`.
 
 ## Lancer le serveur de développement
 
-Le plus simple est de passer par Docker (voir le README racine). Pour lancer le frontend seul, hors Docker :
+Prérequis : Node 20+ et l'API démarrée (voir le README racine).
 
 ```bash
-cd frontend
+cd web
 npm install
 npm run dev
 ```
@@ -17,7 +17,7 @@ L'application est disponible sur `http://localhost:5173`. Elle attend l'API sur 
 
 ## Stack
 
-- **React 19** + **TypeScript** (`strict: true`)
+- **React** + **TypeScript** (`strict: true`)
 - **React Router** — routage, avec routes protégées (`/collection`, `/stats`)
 - **Tailwind CSS v4** — pas de librairie de composants prête à l'emploi
 
