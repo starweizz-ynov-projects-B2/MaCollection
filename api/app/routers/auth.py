@@ -27,12 +27,7 @@ def register(user_in: UserCreate, session: Session = Depends(get_session)):
         logger.warning("Tentative de création de compte avec un email déjà pris : %s", user_in.email)
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email déjà pris")
 
-    existingUserUsername = session.exec(select(User).where(User.username == user_in.username)).first()
-    if existingUserUsername:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Nom d'utilisateur déjà pris")
-
     user = User(
-        username=user_in.username,
         email=user_in.email,
         hashed_password=hash_password(user_in.password),
     )
@@ -41,7 +36,6 @@ def register(user_in: UserCreate, session: Session = Depends(get_session)):
     session.refresh(user)
     logger.info("Nouveau compte créé : email=%s", user_in.email)
     return user
-
 
 @router.post(
     "/login",
@@ -59,7 +53,6 @@ def login(user_in: LoginRequest, session: Session = Depends(get_session)):
     token = create_access_token(data={"sub": str(user.id)})
     logger.info("Connexion réussie : email=%s", user_in.email)
     return Token(access_token=token)
-
 
 @router.get(
     "/me",

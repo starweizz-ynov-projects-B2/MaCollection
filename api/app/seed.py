@@ -58,16 +58,16 @@ def seed():
     with Session(engine) as session:
         # Users
         user_specs = [
-            ("alice", "alice@example.com"),
-            ("bob", "bob@example.com"),
+            "alice@example.com",
+            "bob@example.com",
         ]
         users = []
-        for username, email in user_specs:
+        for email in user_specs:
             existing = session.exec(select(User).where(User.email == email)).first()
             if existing:
                 users.append(existing)
                 continue
-            user = User(username=username, email=email, hashed_password=hash_password("password123"))
+            user = User(email=email, hashed_password=hash_password("password123"))
             session.add(user)
             session.commit()
             session.refresh(user)
