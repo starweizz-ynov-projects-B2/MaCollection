@@ -20,32 +20,47 @@ Ce repo est un projet Ynov B2 qui consiste à créer un site pour mettre en prat
 
 ## Installation
 
-Cloner le projet
-
 ```bash
-  git clone https://github.com/starweizz-ynov-projects-B2/MaCollection.git
+git clone https://github.com/starweizz-ynov-projects-B2/MaCollection.git
+cd MaCollection
 ```
 
-## Déployer le projet
+Prérequis : Python 3.12+ et Node 20+.
 
-Pour lancer et déployer le projet avec Docker voici les commandes à utiliser :
+## Lancer le projet
+
+### 1. Backend (API FastAPI + SQLite)
 
 ```bash
-  # Créer le fichier .env
-  cp .env.example .env
-
-  # Lancer le projet avec
-  docker compose up -d --build
-
-  # Peupler le catalogue (une fois les conteneurs démarrés, idempotent)
-  docker compose exec backend python -m app.seed
-
-  # Cmd pour arrêter le projet
-  docker compose down
+cd api
+python -m venv .venv
+source .venv/bin/activate   # Windows : .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+cp .env.example .env        # puis changer JWT_SECRET
+python -m app.seed          # peuple le catalogue (43 recettes, idempotent)
+uvicorn app.main:app --reload
 ```
 
-Le frontend est disponible sur `http://localhost:5173`, l'API sur `http://localhost:8000`
-(doc interactive : `http://localhost:8000/docs`).
+L'API tourne sur `http://localhost:8000` (doc interactive : `http://localhost:8000/docs`).
+
+### 2. Frontend (React + Vite), dans un second terminal
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Le frontend est disponible sur `http://localhost:5173`.
+
+### Avec Docker (optionnel)
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+docker compose exec backend python -m app.seed
+docker compose down
+```
 
 
 ## Auteurs du projet (à 2)
