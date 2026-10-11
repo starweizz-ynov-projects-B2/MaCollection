@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { http, ApiClientError } from "../../services/http.ts";
 import { useAuth } from "../../context/AuthContext.tsx";
+import FormField from "../../components/FormField.tsx";
 import type { AuthUser, AuthUserResponse } from "../../types/api.ts";
 
 export default function RegisterPage() {
     const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -27,8 +27,8 @@ export default function RegisterPage() {
         setLoading(true);
 
         try {
-            await http.post("/auth/register", { email, username, password });
-            const { access_token } = await http.post<AuthUserResponse>("/auth/login", { email, username, password });
+            await http.post("/auth/register", { email, password });
+            const { access_token } = await http.post<AuthUserResponse>("/auth/login", { email, password });
             const user = await http.get<AuthUser>("/auth/me", access_token);
             login(access_token, user);
             navigate("/");
@@ -62,71 +62,9 @@ export default function RegisterPage() {
                     <p className="mt-1 text-sm text-ink-soft">Créez votre compte en quelques secondes.</p>
 
                     <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
-                        <div className="flex flex-col gap-1.5">
-                            <label htmlFor="email" className="text-xs font-semibold tracking-wide text-ink uppercase">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                placeholder="vous@exemple.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <label htmlFor="username" className="text-xs font-semibold tracking-wide text-ink uppercase">
-                                Nom d'utilisateur
-                            </label>
-                            <input
-                                type="text"
-                                id="username"
-                                placeholder="antonin.russo"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <label
-                                htmlFor="password"
-                                className="text-xs font-semibold tracking-wide text-ink uppercase"
-                            >
-                                Mot de passe
-                            </label>
-                            <input
-                                type="password"
-                                id="password"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                            <label
-                                htmlFor="confirm-password"
-                                className="text-xs font-semibold tracking-wide text-ink uppercase"
-                            >
-                                Confirmation du mot de passe
-                            </label>
-                            <input
-                                type="password"
-                                id="confirm-password"
-                                placeholder="••••••••"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                required
-                                className="border-2 border-ink/20 bg-cream px-3 py-2.5 text-sm text-ink outline-none transition-colors focus:border-basil"
-                            />
-                        </div>
+                        <FormField id="email" label="Email" type="email" placeholder="vous@exemple.com" value={email} onChange={setEmail} />
+                        <FormField id="password" label="Mot de passe" type="password" placeholder="••••••••" value={password} onChange={setPassword} />
+                        <FormField id="confirm-password" label="Confirmation du mot de passe" type="password" placeholder="••••••••" value={confirmPassword} onChange={setConfirmPassword} />
 
                         {error && (
                             <p className="border-l-4 border-tomato bg-tomato/10 px-3 py-2 text-sm text-tomato-dark">
